@@ -36,6 +36,18 @@ type Exporter struct {
 	resourcesScheduled        *prometheus.Desc
 	resourcesSkipped          *prometheus.Desc
 	resourcesTotal            *prometheus.Desc
+
+	timeCatalogApplication    *prometheus.Desc
+	timeConfigRetrieval       *prometheus.Desc
+	timeConvertCatalog        *prometheus.Desc
+	timeExec                  *prometheus.Desc
+	timeFactGeneration        *prometheus.Desc
+	timeFilebucket            *prometheus.Desc
+	timeNodeRetrieval         *prometheus.Desc
+	timePluginsync            *prometheus.Desc
+	timeTransactionEvaluation *prometheus.Desc
+	timeTotal                 *prometheus.Desc
+	timeLastRun               *prometheus.Desc
 }
 
 type T struct {
@@ -57,26 +69,26 @@ type T struct {
 	}
 
 	Time struct {
-		Anchor              float64
-		Archive             float64
-		Catalog_application float64
-		Config_retrieval    float64
-		Convert_catalog     float64
-		Exec                float64
-		Fact_generation     float64
-		File                float64
-		Filebucket          float64
-		Group               float64
-		Node_retrieval      float64
-		//package float64 `yaml: "package_resource"`
-		Plugin_sync            float64
-		Schedule               float64
-		Service                float64
-		Total                  float64
-		Transaction_evaluation float64
-		User                   float64
-		Yumrepo                float64
-		Last_run               float64
+		Anchor                 float64 `yaml: "timeAnchor"`
+		Archive                float64 `yaml: "timeArchive"`
+		Catalog_application    float64 `yaml: "timeCatalogApplication"`
+		Config_retrieval       float64 `yaml: "timeConfigRetrieval"`
+		Convert_catalog        float64 `yaml: "timeConverCatalog"`
+		Exec                   float64 `yaml: "timeExec"`
+		Fact_generation        float64 `yaml: "timeFactGeneration"`
+		File                   float64 `yaml: "timeFile"`
+		Filebucket             float64 `yaml: "timeFileBucket"`
+		Group                  float64 `yaml: "timeGroup"`
+		Node_retrieval         float64 `yaml: "timeNodeRetrieval"`
+		Package                float64 `yaml: "timePackage"`
+		Plugin_sync            float64 `yaml: "tomePluginSync"`
+		Schedule               float64 `yaml: "timeSchedule"`
+		Service                float64 `yaml: "timeService"`
+		Total                  float64 `yaml: "timeTotal"`
+		Transaction_evaluation float64 `yaml: "timeTransactionEvaluation"`
+		User                   float64 `yaml: "timeUser"`
+		Yumrepo                float64 `yaml: "timeYumrepo"`
+		Last_run               float64 `yaml: "timeLastRunEpoch"`
 	}
 	Changes struct {
 		Changes float64
@@ -93,19 +105,7 @@ func init() {
 	prometheus.MustRegister(version.NewCollector("puppet_last_run_exporter"))
 }
 
-/*func NewVersionExporter() *Exporter {
-	return &Exporter{
-		versionPuppet: prometheus.NewDesc(
-			prometheus.BuildFQName(namespace, "", "Version"),
-			"Puppet versions",
-			nil,
-			nil,
-			),
-
-	}
-} */
-
-func NewResourcesExporter() *Exporter {
+func NewSummaryExporter() *Exporter {
 	return &Exporter{
 		resourcesChanged: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "ResourcesChanged"),
 			"Number of changed resources",
@@ -152,6 +152,56 @@ func NewResourcesExporter() *Exporter {
 			nil,
 			nil,
 		),
+		timeCatalogApplication: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeCatalogApplication"),
+			"Castalog application time",
+			nil,
+			nil,
+		),
+		timeConfigRetrieval: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeConfigRetrieval"),
+			"Castalog application time",
+			nil,
+			nil,
+		),
+		timeConvertCatalog: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeConvertCatalog"),
+			"Castalog conversion time",
+			nil,
+			nil,
+		),
+		timeFactGeneration: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeFactGeneration"),
+			"Fact generation time",
+			nil,
+			nil,
+		),
+		timeFilebucket: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeFileBucket"),
+			"Filebucket time",
+			nil,
+			nil,
+		),
+		timeNodeRetrieval: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeNodeRetrieval"),
+			"Node retrieval time",
+			nil,
+			nil,
+		),
+		timePluginsync: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimePluginSync"),
+			"Plugin sync time",
+			nil,
+			nil,
+		),
+		timeTransactionEvaluation: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeTransactionEvaluation"),
+			"Transaction Evaluation time",
+			nil,
+			nil,
+		),
+		timeTotal: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeTotal"),
+			"Total time",
+			nil,
+			nil,
+		),
+		timeLastRun: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "TimeLastRun"),
+			"Last puppet run",
+			nil,
+			nil,
+		),
 	}
 
 }
@@ -188,6 +238,16 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	ch <- prometheus.MustNewConstMetric(e.resourcesScheduled, prometheus.GaugeValue, t.Resources.Scheduled)
 	ch <- prometheus.MustNewConstMetric(e.resourcesSkipped, prometheus.GaugeValue, t.Resources.Skipped)
 	ch <- prometheus.MustNewConstMetric(e.resourcesTotal, prometheus.GaugeValue, t.Resources.Total)
+	ch <- prometheus.MustNewConstMetric(e.timeCatalogApplication, prometheus.GaugeValue, t.Time.Catalog_application)
+	ch <- prometheus.MustNewConstMetric(e.timeConfigRetrieval, prometheus.GaugeValue, t.Time.Config_retrieval)
+	ch <- prometheus.MustNewConstMetric(e.timeConvertCatalog, prometheus.GaugeValue, t.Time.Convert_catalog)
+	ch <- prometheus.MustNewConstMetric(e.timeFactGeneration, prometheus.GaugeValue, t.Time.Fact_generation)
+	ch <- prometheus.MustNewConstMetric(e.timeFilebucket, prometheus.GaugeValue, t.Time.Filebucket)
+	ch <- prometheus.MustNewConstMetric(e.timeNodeRetrieval, prometheus.GaugeValue, t.Time.Node_retrieval)
+	ch <- prometheus.MustNewConstMetric(e.timePluginsync, prometheus.GaugeValue, t.Time.Plugin_sync)
+	ch <- prometheus.MustNewConstMetric(e.timeTransactionEvaluation, prometheus.GaugeValue, t.Time.Transaction_evaluation)
+	ch <- prometheus.MustNewConstMetric(e.timeTotal, prometheus.GaugeValue, t.Time.Total)
+	ch <- prometheus.MustNewConstMetric(e.timeLastRun, prometheus.CounterValue, t.Time.Last_run)
 	return nil
 }
 
@@ -201,14 +261,23 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- e.resourcesScheduled
 	ch <- e.resourcesSkipped
 	ch <- e.resourcesTotal
+	ch <- e.timeCatalogApplication
+	ch <- e.timeConfigRetrieval
+	ch <- e.timeFactGeneration
+	ch <- e.timeFilebucket
+	ch <- e.timeNodeRetrieval
+	ch <- e.timePluginsync
+	ch <- e.timeTransactionEvaluation
+	ch <- e.timeTotal
+	ch <- e.timeLastRun
 }
 
 func main() {
 
 	flag.Parse()
 
-	resourceExporter := NewResourcesExporter()
-	prometheus.MustRegister(resourceExporter)
+	summaryExporter := NewSummaryExporter()
+	prometheus.MustRegister(summaryExporter)
 
 	log.Printf("Starting Server: %s", *listeningAddress)
 	http.Handle(*metricsEndpoint, promhttp.Handler())
