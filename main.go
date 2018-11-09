@@ -8,8 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	//"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/version"
 	"sync"
 )
@@ -107,12 +105,12 @@ func init() {
 
 func NewSummaryExporter() *Exporter {
 	return &Exporter{
-		resourcesChanged: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "ResourcesChanged"),
+		resourcesChanged: prometheus.NewDesc(prometheus.BuildFQName(namespace, "resources", "ResourcesChanged"),
 			"Number of changed resources",
 			nil,
 			nil,
 		),
-		resourcesCorrectiveChange: prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "ResourcesCorrectiveChange"),
+		resourcesCorrectiveChange: prometheus.NewDesc(prometheus.BuildFQName(namespace, "resources", "ResourcesCorrectiveChange"),
 			"Number of corrective changes",
 			nil,
 			nil,
@@ -217,7 +215,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 
-	dat, error := ioutil.ReadFile("last_run_summary.yaml")
+	dat, error := ioutil.ReadFile("./last_run_summary.yaml")
 	if error != nil {
 		log.Fatal(error)
 	}
